@@ -1,0 +1,184 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "For My Love Gayathri 💖";
+}
+
+<div class="valentine-container">
+
+    <h1 class="sparkle-text">
+        Happy Valentine’s Day Gayathri💜
+    </h1>
+
+    <p>You make my world brighter every day 🌸</p>
+
+    <h2>Will you be my Valentine? 💌</h2>
+
+    <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExejIxeGt2eXMyNWZiZjRxNWtnY2c5cW14MGV6a2Q1c3Z5bnQ3eWd3ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/QUGf8x31iMVSdbNn00/giphy.gif"
+         alt="Cute Love GIF"
+         class="valentine-gif" />
+
+    <div class="button-group">
+        <button class="yes-btn" onclick="sayYes()">Yes 💕</button>
+        <button class="no-btn" id="noButton">No 💔</button>
+    </div>
+    <canvas id="fireworksCanvas"></canvas>
+
+
+    <h3 id="responseMessage" class="response"></h3>
+
+</div>
+
+
+@section Scripts {
+
+    <script>
+        const noButton = document.getElementById("noButton");
+        const container = document.querySelector(".valentine-container");
+
+        let isAbsolute = false;
+
+        container.addEventListener("mousemove", function (e) {
+
+            const containerRect = container.getBoundingClientRect();
+            const btnRect = noButton.getBoundingClientRect();
+
+            const cursorX = e.clientX;
+            const cursorY = e.clientY;
+
+            const btnCenterX = btnRect.left + btnRect.width / 2;
+            const btnCenterY = btnRect.top + btnRect.height / 2;
+
+            const distance = Math.sqrt(
+                (cursorX - btnCenterX) ** 2 +
+                (cursorY - btnCenterY) ** 2
+            );
+
+            if (distance < 100) {
+
+                // Convert to absolute only once
+                if (!isAbsolute) {
+                    noButton.style.position = "absolute";
+                    noButton.style.left = (btnRect.left - containerRect.left) + "px";
+                    noButton.style.top = (btnRect.top - containerRect.top) + "px";
+                    isAbsolute = true;
+                }
+
+                let moveX = btnCenterX - cursorX;
+                let moveY = btnCenterY - cursorY;
+
+                const length = Math.sqrt(moveX * moveX + moveY * moveY);
+
+                moveX = (moveX / length) * 70;
+                moveY = (moveY / length) * 70;
+
+                let newLeft = noButton.offsetLeft + moveX;
+                let newTop = noButton.offsetTop + moveY;
+
+                // Keep inside white container
+                newLeft = Math.max(0, Math.min(container.clientWidth - noButton.offsetWidth, newLeft));
+                newTop = Math.max(0, Math.min(container.clientHeight - noButton.offsetHeight, newTop));
+
+                noButton.style.left = newLeft + "px";
+                noButton.style.top = newTop + "px";
+            }
+        });
+        function launchFireworks() {
+
+            const canvas = document.getElementById("fireworksCanvas");
+            const ctx = canvas.getContext("2d");
+
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+
+            function createExplosion(x, y) {
+                for (let i = 0; i < 100; i++) {
+                    particles.push({
+                        x: x,
+                        y: y,
+                        radius: 2,
+                        color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+                        speedX: (Math.random() - 0.5) * 10,
+                        speedY: (Math.random() - 0.5) * 10,
+                        life: 100
+                    });
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+
+                particles.forEach((p, index) => {
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                    p.life--;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+
+                    if (p.life <= 0) {
+                        particles.splice(index, 1);
+                    }
+                });
+
+                requestAnimationFrame(animate);
+            }
+
+            // Launch fireworks repeatedly
+            let count = 0;
+            const interval = setInterval(() => {
+                createExplosion(
+                    Math.random() * canvas.width,
+                    Math.random() * canvas.height / 2
+                );
+
+                count++;
+                if (count > 8) clearInterval(interval);
+
+            }, 600);
+
+            animate();
+        }
+
+
+
+
+        function sayYes() {
+            document.getElementById("responseMessage").innerHTML =
+                "Yayyyyy 💖 Love you pappa💕💍";
+            launchFireworks();
+        }
+
+        // Floating hearts
+        const hearts = ["💖", "💘", "💗", "💓", "💞", "💕", "❤️", "🩷", "💜"];
+
+        setInterval(() => {
+
+            const heart = document.createElement("div");
+
+            heart.innerHTML = hearts[Math.floor(Math.random() * hearts.length)];
+
+            heart.style.position = "fixed";
+            heart.style.left = Math.random() * window.innerWidth + "px";
+            heart.style.top = window.innerHeight + "px";
+            heart.style.fontSize = Math.random() * 25 + 20 + "px";
+            heart.style.animation = "floatUp 5s linear forwards";
+            heart.style.zIndex = "0";
+            heart.style.pointerEvents = "none";
+
+            document.body.appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 5000);
+
+        }, 300);
+
+    </script>
+
+}
